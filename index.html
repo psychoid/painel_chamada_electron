@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <title>Painel de Exibição</title>        
+        <script src="https://cdn.socket.io/4.4.1/socket.io.min.js" integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H" crossorigin="anonymous"></script>
+        <style>
+            * {
+                margin:0;
+                padding:0;
+            }
+            html {
+                height:100%;
+                width:100%;
+            }
+            body {
+                height:100%;
+                width:100%;
+                font-family: Verdana, Geneva, Tahoma, sans-serif;
+            }
+            .alerta {
+                background-color:lightgray;
+                height: 20%;    
+                width: 100%;    
+                padding-top: 30px;       
+            }
+            .alerta .texto {
+                font-size: 100px;
+                text-align: center;
+                font-weight: bold;
+            }
+            .piscar {
+                animation: blinker 1s linear infinite;
+                color:red;
+            }
+            @keyframes blinker {  
+                50% { opacity: 0; }
+            }
+
+            .rodape {
+                height: 80%;
+                width: 100%;
+                text-align: center;
+            }
+
+            .rodape .logo {
+                padding-top: 10%;
+                width: 20%;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="alerta" id="alerta">
+                
+                <div class="texto" id="texto">
+                   
+                </div>
+        </div>
+
+        <div class="rodape" id="rodape">
+        
+          <img id="logo" class="logo" src="logo.png" />
+
+        </div>
+
+        <script>
+
+            var socket = io("http://localhost:3000", { transports: ['websocket', 'polling', 'flashsocket'] } );
+            let speech = new SpeechSynthesisUtterance();
+            speech.lang = "br";
+
+            var alerta = document.getElementById('alerta');
+            var texto = document.getElementById('texto');
+
+            socket.on("alertar", (message) => {
+                texto.innerHTML = message;
+                speech.text = "Paciente: " + message +", encôntrá-se na recepção";
+                piscar();
+                window.speechSynthesis.speak(speech);
+            });
+
+            const piscar = () => {
+                    texto.classList.add('piscar');
+                    delay(function(){
+                        texto.classList.remove('piscar');
+                    }, 5000 ); 
+                    
+            };
+
+            var delay = ( function() {
+                var timer = 0;
+                return function(callback, ms) {
+                    clearTimeout (timer);
+                    timer = setTimeout(callback, ms);
+                };
+            })();
+
+
+            
+
+        </script>
+    </body>
+</html>
